@@ -1,61 +1,181 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Simple Log Microservice
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## 1. Overview
 
-## About Laravel
+Simple Log Microservice  is a microservice built with Laravel 12 designed to consume events from the "Summit API" and persist them as log entries in a MongoDB database. This service acts as a centralized logging mechanism for specific events originating from the Summit API, providing a durable and queryable store for event data.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+This project utilizes Laravel Sail for a seamless Docker-based local development environment.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 2. Features
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+* **Log Persistence:** Stores event data as structured log entries in a MongoDB database.
+* **Scalable Architecture:** Built on Laravel 12, suitable for microservice patterns.
+* **Dockerized Environment:** Uses Laravel Sail for easy local setup and consistent development environments.
 
-## Learning Laravel
+## 3. Tech Stack
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+* **Backend Framework:** Laravel 12
+* **Database:** MongoDB
+* **PHP Version:** 8.3
+* **Web Server:** Nginx
+* **Containerization:** Docker (via Laravel Sail)
+* **Dependency Management:** Composer
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## 4. Prerequisites
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Before you begin, ensure you have the following installed on your local machine:
 
-## Laravel Sponsors
+* Git
+* Docker Desktop (or Docker Engine and Docker Compose)
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 5. Getting Started
 
-### Premium Partners
+Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 5.1. Clone the Repository
 
-## Contributing
+```bash
+git clone [https://github.com/your-username/your-repo-name.git](https://github.com/your-username/your-repo-name.git)
+cd your-repo-name
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 5.2. Environment Configuration
 
-## Code of Conduct
+1.  **Copy Environment File:**
+    Laravel utilizes an `.env` file for configuration. Copy the example file:
+    ```bash
+    cp .env.example .env
+    ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+2.  **Configure `.env`:**
+    Open the `.env` file and update the following critical variables:
 
-## Security Vulnerabilities
+    * **Application Settings:**
+        ```dotenv
+        APP_NAME="Summit Event Logger"
+        APP_ENV=local
+        APP_KEY= # Will be generated later
+        APP_DEBUG=true
+        APP_URL=http://localhost
+        ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+    * **Database Connection (MongoDB):**
+      Ensure your `docker-compose.yml` (managed by Sail) includes a MongoDB service. Update these settings to match your MongoDB container configuration (Sail defaults are often `sailmongodb`, `localhost` or service name for host, port `27017`).
+        ```dotenv
+        DB_CONNECTION=mongodb
+        DB_HOST=mongodb # Or the service name defined in docker-compose.yml for MongoDB
+        DB_PORT=27017
+        DB_DATABASE=summit_logs # Your desired database name
+        DB_USERNAME=sail      # Your MongoDB username (if authentication is enabled)
+        DB_PASSWORD=password  # Your MongoDB password (if authentication is enabled)
+        ```
+      *Note: Laravel Sail's default MongoDB setup might not enforce auth initially. Adjust `DB_USERNAME` and `DB_PASSWORD` if you've configured authentication on your MongoDB service.*
 
-## License
+    * **Summit API Configuration:**
+      Add variables required to connect to the "Summit API". These are examples; actual names may vary.
+        ```dotenv
+        SUMMIT_API_BASE_URL=[https://api.summit.example.com/v1](https://api.summit.example.com/v1)
+        SUMMIT_API_KEY=your_summit_api_key
+        # Add any other Summit API related credentials or settings
+        ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 5.3. Start Sail Containers
+
+1.  **Build and Start Containers:**
+    This command will download the necessary Docker images (if not already present) and start the application, database, and other defined services.
+    ```bash
+    ./vendor/bin/sail up -d
+    ```
+    *If `vendor/bin/sail` is not found initially (e.g., very first setup before composer install), you might need a preliminary step or use the global Sail installation method if applicable. However, for a cloned project, `composer install` (next step) should bring it in.*
+    *If you encounter issues, you might need to build the images first:*
+    ```bash
+    # Optional: ./vendor/bin/sail build --no-cache
+    ```
+
+### 5.4. Install Dependencies & Finalize Setup
+
+1.  **Install Composer Dependencies:**
+    ```bash
+    ./vendor/bin/sail composer install
+    ```
+
+2.  **Generate Application Key:**
+    ```bash
+    ./vendor/bin/sail artisan key:generate
+    ```
+
+3.  **Run Database Migrations (if applicable):**
+    While MongoDB is schemaless, migrations can be used for creating collections, ensuring indexes, or initial data setup if your `mongodb/laravel-mongodb` package or application logic uses them.
+    ```bash
+    ./vendor/bin/sail artisan migrate
+    ```
+
+4.  **Install NPM Dependencies & Build Assets (Optional):**
+    If your microservice includes any JavaScript/CSS assets that need compilation (e.g., for a small admin panel):
+    ```bash
+    ./vendor/bin/sail npm install
+    ./vendor/bin/sail npm run dev # or prod for production assets
+    ```
+    For a pure backend microservice, this step might not be necessary.
+
+### 5.5. Accessing the Application
+
+Once Sail is up and running:
+* Your application should be accessible at `http://localhost` (or the `APP_PORT` defined in `.env` if changed from default 80).
+* MongoDB should be accessible on its defined port (e.g., `27017` by default from within the Docker network or mapped port if specified in `docker-compose.yml`).
+
+## 6. Environment Variables
+
+Key environment variables to configure in your `.env` file:
+
+* `APP_NAME`: Name of your application.
+* `APP_ENV`: Application environment (`local`, `staging`, `production`).
+* `APP_DEBUG`: Debug mode (`true` for local, `false` for production).
+* `APP_KEY`: Laravel application encryption key.
+* `APP_URL`: Base URL of your application.
+
+* `DB_CONNECTION=mongodb`: Specifies that MongoDB is the database driver.
+* `DB_HOST`: Host for the MongoDB server (usually the Docker service name, e.g., `mongodb`).
+* `DB_PORT`: Port for the MongoDB server (e.g., `27017`).
+* `DB_DATABASE`: Name of the MongoDB database to use.
+* `DB_USERNAME`: Username for MongoDB authentication (if enabled).
+* `DB_PASSWORD`: Password for MongoDB authentication (if enabled).
+
+* `SUMMIT_API_BASE_URL`: Base URL for the Summit API.
+* `SUMMIT_API_KEY`: API key for authenticating with the Summit API.
+* `LOG_CHANNEL`: Typically `stack` or `daily`. For development with Sail, logs are usually visible via `sail logs`.
+* `QUEUE_CONNECTION`: If using queues for event processing (e.g., `redis`, `database`, `sync`).
+
+## 7. Event Consumption from Summit API
+
+This microservice is responsible for fetching/receiving events from the "Summit API". The exact mechanism depends on how Summit API exposes these events:
+
+* **Polling:** The service might periodically poll an endpoint on the Summit API for new events using a scheduled Laravel command (Task Scheduling).
+* **Webhooks:** Summit API might call a specific endpoint on this microservice whenever a new event occurs. This endpoint needs to be defined in `routes/api.php` or `routes/web.php`.
+* **Message Queues:** The service might listen to a message queue (e.g., RabbitMQ, Redis, Kafka) where Summit API publishes events.
+
+**Implementation Details:**
+*(This section should be filled in with the specific logic for your microservice)*
+* e.g., "Events are consumed by a scheduled job `App\Jobs\FetchSummitEventsJob` which runs every 5 minutes."
+* e.g., "An API endpoint `/api/summit-webhook` is exposed to receive POST requests from Summit API."
+* Detail any specific event types consumed and how they are mapped to log entries.
+
+## 8. Database Schema (MongoDB)
+
+Log entries are stored in a MongoDB collection (e.g., `logs` or `summit_event_logs`). A typical log document structure might be:
+
+```json
+{
+  "_id": "ObjectId(...)",
+  "event_type": "USER_LOGIN_SUCCESS", // Type of event from Summit API
+  "event_source": "SummitAPI/v1/users", // Source of the event
+  "payload": { ... }, // Original event payload from Summit API
+  "processed_at": "ISODate(...)", // Timestamp when the event was processed by this microservice
+  "summit_event_id": "unique_event_id_from_summit", // Optional: ID from Summit API
+  "level": "info", // Log level (info, error, warning)
+  "message": "User X successfully logged in.", // A descriptive message
+  "context": { ... }, // Additional contextual information
+  "created_at": "ISODate(...)", // Timestamp from Laravel (Eloquent)
+  "updated_at": "ISODate(...)"  // Timestamp from Laravel (Eloquent)
+}
+
