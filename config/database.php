@@ -112,6 +112,21 @@ return [
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
 
+        // config/database.php
+        'mongodb' => [
+            'driver' => 'mongodb',
+            'host' => env('MONGODB_HOST', '127.0.0.1'),
+            'port' => env('FORWARD_MONGODB_PORT', 27017), // O env('DB_PORT') si usas esa variable consistentemente
+            'database' => env('MONGODB_DATABASE', 'homestead'),
+            'username' => env('MONGODB_USERNAME', 'homestead'),
+            'password' => env('MONGODB_PASSWORD', 'secret'),
+            'options' => [
+                'database' => env('DB_AUTHENTICATION_DATABASE', 'admin'), // Auth source
+                // 'replicaSet' => env('MONGODB_REPLICA_SET'), // Asegúrate que esto esté comentado o ausente si no usas replica set
+                'serverSelectionTimeoutMS' => 30000, // Puedes mantener esto o ajustarlo
+            ],
+        ],
+
     ],
 
     /*
